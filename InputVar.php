@@ -36,7 +36,7 @@ class InputVar extends Frontend
 		
 		$arrTag = explode('::', $strTag);
 		
-		if (!is_array($arrTag) || !strlen($arrTag[1]) || !strlen($arrTag[1]))
+		if (!is_array($arrTag) || !strlen($arrTag[0]) || !strlen($arrTag[1]))
 			return false;
 		
 		switch( $arrTag[0] )
