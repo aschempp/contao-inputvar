@@ -21,7 +21,7 @@
  * Software Foundation website at <http://www.gnu.org/licenses/>.
  *
  * PHP version 5
- * @copyright  Andreas Schempp 2009-2010
+ * @copyright  Andreas Schempp 2009-2011
  * @author     Andreas Schempp <andreas@schempp.ch>
  * @license    http://opensource.org/licenses/lgpl-3.0.html
  * @version    $Id$
@@ -72,6 +72,47 @@ class InputVar extends Frontend
 			
 			default:
 				return false;
+		}
+		
+		switch( $arrTag[2] )
+		{
+			case 'mysql_real_escape_string':
+			case 'addslashes':
+			case 'stripslashes':
+			case 'standardize':
+			case 'ampersand':
+			case 'specialchars':
+			case 'nl2br':
+			case 'nl2br_pre':
+			case 'strtolower':
+			case 'utf8_strtolower':
+			case 'strtoupper':
+			case 'utf8_strtoupper':
+			case 'ucfirst':
+			case 'lcfirst':
+			case 'ucwords':
+			case 'trim':
+			case 'rtrim':
+			case 'ltrim':
+			case 'utf8_romanize':
+			case 'strlen':
+			case 'strrev':
+				$varValue = $arrTag[2]($varValue);
+				break;
+			
+			case 'decodeEntities':
+			case 'encodeEmail':
+				$this->import('String');
+				$varValue = $this->String->{$arrTag[2]}($varValue);
+				break;
+			
+			case 'number_format':
+				$varValue = number_format($varValue, 0, $GLOBALS['TL_LANG']['MSC']['decimalSeparator'], $GLOBALS['TL_LANG']['MSC']['thousandsSeparator']);
+				break;
+			
+			case 'number_format_2':
+				$varValue = number_format($varValue, 2, $GLOBALS['TL_LANG']['MSC']['decimalSeparator'], $GLOBALS['TL_LANG']['MSC']['thousandsSeparator']);
+				break;
 		}
 		
 		return is_array($varValue) ? implode(', ', $varValue) : $varValue;
