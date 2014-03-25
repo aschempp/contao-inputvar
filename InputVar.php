@@ -33,6 +33,8 @@ class InputVar extends Frontend
 	public function replaceInputVars($strTag)
 	{
 		$arrTag = explode('::', $strTag);
+		$arrOptions = $this->getOptionsFromString($strTag);
+		$default = isset($arrOptions['default']) ? $arrOptions['default'] : null;
 
 		if ($arrTag[1] == '')
 			return false;
@@ -41,32 +43,32 @@ class InputVar extends Frontend
 		{
 			case 'get':
 				$this->import('Input');
-				$varValue = $this->Input->get($arrTag[1]);
+				$varValue = $this->Input->get($arrTag[1]) ?: $default;
 				break;
 
 			case 'post':
 				$this->import('Input');
-				$varValue = $this->Input->post($arrTag[1]);
+				$varValue = $this->Input->post($arrTag[1]) ?: $default;
 				break;
 
 			case 'postHtml':
 				$this->import('Input');
-				$varValue = $this->Input->postHtml($arrTag[1]);
+				$varValue = $this->Input->postHtml($arrTag[1]) ?: $default;
 				break;
 
 			case 'postRaw':
 				$this->import('Input');
-				$varValue = $this->Input->postRaw($arrTag[1]);
+				$varValue = $this->Input->postRaw($arrTag[1]) ?: $default;
 				break;
 
 			case 'cookie':
 				$this->import('Input');
-				$varValue = $this->Input->cookie($arrTag[1]);
+				$varValue = $this->Input->cookie($arrTag[1]) ?: $default;
 				break;
 
 			case 'session':
 				$this->import('Session');
-				$varValue = $this->Session->get($arrTag[1]);
+				$varValue = $this->Session->get($arrTag[1]) ?: $default;
 				break;
 
 			default:
@@ -115,5 +117,29 @@ class InputVar extends Frontend
 		}
 
 		return is_array($varValue) ? implode(', ', $varValue) : $varValue;
+	}
+
+	/**
+	 * Get options from Inserttag
+	 *
+	 * @todo This should most likely be implemented in the core
+	 *       https://github.com/contao/core/blob/master/system/modules/core/library/Contao/Controller.php#L1490
+	 *
+	 * @param  string $strInsertTag The inserttag
+	 * @return array                An array of options
+	 */
+	public function getOptionsFromString($strInsertTag)
+	{
+		$strOptions = explode('?', $strInsertTag);
+		$arrOptions = explode('&', $strOptions[1]);
+		$arrOptionsResult = array();
+
+		foreach($arrOptions as $strOption)
+		{
+			$arrOption = explode('=', $strOption);
+			$arrOptionsResult[$arrOption[0]] = isset($arrOption[1]) ? $arrOption[1] : true;
+		}
+
+		return $arrOptionsResult;
 	}
 }
